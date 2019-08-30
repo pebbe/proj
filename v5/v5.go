@@ -14,13 +14,16 @@ import (
 )
 
 type Context struct {
-	pj_context *C.PJ_CONTEXT
-	opened     bool
+	pj_context  *C.PJ_CONTEXT
+	opened      bool
+	counter     uint64
+	projections map[uint64]*Proj
 }
 
 type Proj struct {
 	pj      *C.PJ
 	context *Context
+	index   uint64
 	opened  bool
 }
 
@@ -35,8 +38,10 @@ var (
 
 func NewContext() *Context {
 	ctx := Context{
-		pj_context: C.proj_context_create(),
-		opened:     true,
+		pj_context:  C.proj_context_create(),
+		counter:     0,
+		projections: make(map[uint64]*Proj),
+		opened:      true,
 	}
 	runtime.SetFinalizer(&ctx, (*Context).Close)
 	return &ctx
@@ -44,10 +49,23 @@ func NewContext() *Context {
 
 func (ctx *Context) Close() {
 	if ctx.opened {
+		indexen := make([]uint64, 0, len(ctx.projections))
+		for i := range ctx.projections {
+			indexen = append(indexen, i)
+		}
+		for _, i := range indexen {
+			p := ctx.projections[i]
+			if p.opened {
+				C.proj_destroy(p.pj)
+				p.context = nil
+				p.opened = false
+			}
+			delete(ctx.projections, i)
+		}
+
 		C.proj_context_destroy(ctx.pj_context)
 		ctx.pj_context = nil
 		ctx.opened = false
-		// TODO: destroy projections
 	}
 }
 
@@ -68,10 +86,11 @@ func (ctx *Context) Create(definition string) (*Proj, error) {
 	p := Proj{
 		opened:  true,
 		context: ctx,
+		index:   ctx.counter,
 		pj:      pj,
 	}
-
-	// TODO: projection toevoegen aan context
+	ctx.projections[ctx.counter] = &p
+	ctx.counter++
 
 	runtime.SetFinalizer(&p, (*Proj).Close)
 	return &p, nil
@@ -80,9 +99,11 @@ func (ctx *Context) Create(definition string) (*Proj, error) {
 func (p *Proj) Close() {
 	if p.opened {
 		C.proj_destroy(p.pj)
+		if p.context.opened {
+			delete(p.context.projections, p.index)
+		}
 		p.context = nil
 		p.opened = false
-		// todo: projection verwijderen uit context
 	}
 }
 
