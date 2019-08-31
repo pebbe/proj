@@ -182,7 +182,7 @@ Transform a series of coordinates, where the individual coordinate dimension may
 
 3. of length one, i.e. a constant, which will be treated as a fully populated slice of that constant value
 
-TODO: what if input is constant, but output is not?
+Note: if an input coordinate is constant, but the output coordinate varies, you need to supply a fully populated slice as input
 */
 func (p *PJ) TransSlice(direction Direction, u1, v1, w1, t1 []float64) (u2, v2, w2, t2 []float64, err error) {
 	if !p.opened {

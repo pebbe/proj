@@ -12,7 +12,7 @@ import (
 func UTMzone(lng, lat float64) (xzone int, yzone string, err error) {
 
 	if lat < -80 || lat > 84 {
-		err = errors.New("Arctic and antarctic region are not in UTM")
+		err = errors.New("Arctic and Antarctic region are not in UTM")
 		return
 	}
 
@@ -23,7 +23,7 @@ func UTMzone(lng, lat float64) (xzone int, yzone string, err error) {
 		lng -= 360
 	}
 
-	xzone = 1 + int((lng + 180) / 6)
+	xzone = 1 + int((lng+180)/6)
 	if lat > 72 && lng > 0 && lng < 42 {
 		if lng < 9 {
 			xzone = 31
@@ -39,7 +39,7 @@ func UTMzone(lng, lat float64) (xzone int, yzone string, err error) {
 		xzone = 32
 	}
 
-	yzone = string("CDEFGHJKLMNPQRSTUVWXX"[int((lat + 80) / 8)])
+	yzone = string("CDEFGHJKLMNPQRSTUVWXX"[int((lat+80)/8)])
 
-    return
+	return
 }
