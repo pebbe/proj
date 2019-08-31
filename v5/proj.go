@@ -9,6 +9,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"runtime"
 	"unsafe"
@@ -106,7 +107,7 @@ func (ctx *Context) Create(definition string) (*PJ, error) {
 	cs := C.CString(definition)
 	defer C.free(unsafe.Pointer(cs))
 	pj := C.proj_create(ctx.pj_context, cs)
-	if C.pjnull(pj) == 0 {
+	if pj == nil {
 		errno := C.proj_context_errno(ctx.pj_context)
 		err := C.GoString(C.proj_errno_string(errno))
 		return &PJ{}, errors.New(err)
@@ -249,17 +250,21 @@ func (p *PJ) TransSlice(direction Direction, u1, v1, w1, t1 []float64) (u2, v2, 
 
 	st := C.size_t(C.sizeof_double)
 
-	C.proj_trans_generic(
+	count := int(C.proj_trans_generic(
 		p.pj,
 		C.PJ_DIRECTION(direction),
 		up, st, unc,
 		vp, st, vnc,
 		wp, st, wnc,
-		tp, st, tnc)
+		tp, st, tnc))
 
 	e := C.proj_errno(p.pj)
 	if e != 0 {
 		return nil, nil, nil, nil, errors.New(C.GoString(C.proj_errno_string(e)))
+	}
+
+	if count != n {
+		return nil, nil, nil, nil, fmt.Errorf("Got %d coordinates, translated %d coordinates", n, count)
 	}
 
 	u2 = make([]float64, un)

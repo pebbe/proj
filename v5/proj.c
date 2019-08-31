@@ -1,9 +1,5 @@
 #include "proj_go.h"
 
-int pjnull(PJ *pj) {
-    return pj == 0 ? 0 : 1;
-}
-
 void trans(PJ *pj, PJ_DIRECTION direction, double u1, double v1, double w1, double t1, double *u2, double *v2, double *w2, double *t2) {
     PJ_COORD
 	co1,
