@@ -173,6 +173,17 @@ func (p *PJ) Trans(direction Direction, u1, v1, w1, t1 float64) (u2, v2, w2, t2 
 	return float64(u), float64(v), float64(w), float64(t), nil
 }
 
+/*
+Transform a series of coordinates, where the individual coordinate dimension may be represented by a slice that is either
+
+ 1. fully populated
+
+ 2. nil and/or a length of zero, which will be treated as a fully populated slice of zeroes
+
+ 3. of length one, i.e. a constant, which will be treated as a fully populated slice of that constant value
+
+TODO: what if input is constant, but output is not?
+*/
 func (p *PJ) TransSlice(direction Direction, u1, v1, w1, t1 []float64) (u2, v2, w2, t2 []float64, err error) {
 	if !p.opened {
 		return nil, nil, nil, nil, errProjectionClosed
