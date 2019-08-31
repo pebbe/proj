@@ -1,7 +1,7 @@
 #include "proj_go.h"
 
 int pjnull(PJ *pj) {
-    return pj == 0 ? 1 : 0;
+    return pj == 0 ? 0 : 1;
 }
 
 void trans(PJ *pj, PJ_DIRECTION direction, double u1, double v1, double w1, double t1, double *u2, double *v2, double *w2, double *t2) {
@@ -17,4 +17,14 @@ void trans(PJ *pj, PJ_DIRECTION direction, double u1, double v1, double w1, doub
     *v2 = co2.uvwt.v;
     *w2 = co2.uvwt.w;
     *t2 = co2.uvwt.t;    
+}
+
+PJ_COORD uvwt(double u, double v, double w, double t) {
+    PJ_COORD
+	c;
+    c.uvwt.u = u;
+    c.uvwt.v = v;
+    c.uvwt.w = w;
+    c.uvwt.t = t;
+    return c;
 }
