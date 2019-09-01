@@ -157,7 +157,7 @@ func (p *PJ) Info() (ProjInfo, error) {
 	}, nil
 }
 
-// Transform a single transformation
+// Transform a single coordinate
 func (p *PJ) Trans(direction Direction, u1, v1, w1, t1 float64) (u2, v2, w2, t2 float64, err error) {
 	if !p.opened {
 		return 0, 0, 0, 0, errProjectionClosed
