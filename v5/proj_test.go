@@ -1,7 +1,7 @@
 package proj_test
 
 import (
-	"github.com/jackielii/proj/v5"
+	"github.com/pebbe/proj/v5"
 
 	"fmt"
 	"testing"

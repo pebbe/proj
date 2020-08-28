@@ -1,3 +1,3 @@
-module github.com/jackielii/proj/v5
+module github.com/pebbe/proj/v5
 
 go 1.14
