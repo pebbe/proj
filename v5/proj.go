@@ -126,6 +126,39 @@ func (ctx *Context) Create(definition string) (*PJ, error) {
 	return &p, nil
 }
 
+func (ctx *Context) CreateCRS2CRS(srcDefn, dstDefn string) (*PJ, error) {
+	if !ctx.opened {
+		return &PJ{}, errContextClosed
+	}
+
+	srcDefnC := C.CString(srcDefn)
+	dstDefnC := C.CString(dstDefn)
+	defer func() {
+		C.free(unsafe.Pointer(srcDefnC))
+		C.free(unsafe.Pointer(dstDefnC))
+	}()
+
+	pj := C.proj_create_crs_to_crs(ctx.pj_context, srcDefnC, dstDefnC, nil)
+	if pj == nil {
+		errno := C.proj_context_errno(ctx.pj_context)
+		err := C.GoString(C.proj_errno_string(errno))
+		return &PJ{}, errors.New(err)
+	}
+
+	p := PJ{
+		opened:  true,
+		context: ctx,
+		index:   ctx.counter,
+		pj:      pj,
+	}
+
+	ctx.projections[ctx.counter] = &p
+	ctx.counter++
+
+	runtime.SetFinalizer(&p, (*PJ).Close)
+	return &p, nil
+}
+
 // Close a transformation object
 func (p *PJ) Close() {
 	if p.opened {
