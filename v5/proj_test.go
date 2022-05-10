@@ -1,7 +1,7 @@
 package proj_test
 
 import (
-	"github.com/pebbe/proj/v5"
+	"github.com/animesh2049/proj/v5"
 
 	"fmt"
 	"testing"
