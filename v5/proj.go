@@ -126,19 +126,20 @@ func (ctx *Context) Create(definition string) (*PJ, error) {
 	return &p, nil
 }
 
-func (ctx *Context) CreateCRS2CRS(srcDefn, dstDefn string) (*PJ, error) {
+// Create a transformation object that is a pipeline between two known coordinate reference systems
+func (ctx *Context) CreateCRS2CRS(srcDefinition, dstDefinition string) (*PJ, error) {
 	if !ctx.opened {
 		return &PJ{}, errContextClosed
 	}
 
-	srcDefnC := C.CString(srcDefn)
-	dstDefnC := C.CString(dstDefn)
+	srcDefinitionC := C.CString(srcDefinition)
+	dstDefinitionC := C.CString(dstDefinition)
 	defer func() {
-		C.free(unsafe.Pointer(srcDefnC))
-		C.free(unsafe.Pointer(dstDefnC))
+		C.free(unsafe.Pointer(srcDefinitionC))
+		C.free(unsafe.Pointer(dstDefinitionC))
 	}()
 
-	pj := C.proj_create_crs_to_crs(ctx.pj_context, srcDefnC, dstDefnC, nil)
+	pj := C.proj_create_crs_to_crs(ctx.pj_context, srcDefinitionC, dstDefinitionC, nil)
 	if pj == nil {
 		errno := C.proj_context_errno(ctx.pj_context)
 		err := C.GoString(C.proj_errno_string(errno))
